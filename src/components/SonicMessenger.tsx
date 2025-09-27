@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "../lib/build/sonicnet.js";
 
 const SonicMessenger: React.FC = () => {
   const SonicNet = (window as any).SonicNet;

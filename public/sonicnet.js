@@ -1,3 +1,129 @@
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.SonicNet = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const SonicSocket = require("./sonic-socket.js");
+const SonicServer = require("./sonic-server.js");
+const SonicCoder = require("./sonic-coder.js");
+
+module.exports = {
+  SonicSocket,
+  SonicServer,
+  SonicCoder,
+};
+
+},{"./sonic-coder.js":3,"./sonic-server.js":4,"./sonic-socket.js":5}],2:[function(require,module,exports){
+function RingBuffer(maxLength) {
+  this.array = [];
+  this.maxLength = maxLength;
+}
+
+RingBuffer.prototype.get = function(index) {
+  if (index >= this.array.length) {
+    return null;
+  }
+  return this.array[index];
+};
+
+RingBuffer.prototype.last = function() {
+  if (this.array.length == 0) {
+    return null;
+  }
+  return this.array[this.array.length - 1];
+}
+
+RingBuffer.prototype.add = function(value) {
+  // Append to the end, remove from the front.
+  this.array.push(value);
+  if (this.array.length >= this.maxLength) {
+    this.array.splice(0, 1);
+  }
+};
+
+RingBuffer.prototype.length = function() {
+  // Return the actual size of the array.
+  return this.array.length;
+};
+
+RingBuffer.prototype.clear = function() {
+  this.array = [];
+};
+
+RingBuffer.prototype.copy = function() {
+  // Returns a copy of the ring buffer.
+  var out = new RingBuffer(this.maxLength);
+  out.array = this.array.slice(0);
+  return out;
+};
+
+RingBuffer.prototype.remove = function(index, length) {
+  //console.log('Removing', index, 'through', index+length);
+  this.array.splice(index, length);
+};
+
+module.exports = RingBuffer;
+
+},{}],3:[function(require,module,exports){
+/**
+ * A simple sonic encoder/decoder for [a-z0-9] => frequency (and back).
+ * A way of representing characters with frequency.
+ */
+var ALPHABET = '\n abcdefghijklmnopqrstuvwxyz0123456789,.!?@*';
+
+function SonicCoder(params) {
+  params = params || {};
+  this.freqMin = params.freqMin || 18500;
+  this.freqMax = params.freqMax || 19500;
+  this.freqError = params.freqError || 50;
+  this.alphabetString = params.alphabet || ALPHABET;
+  this.startChar = params.startChar || '^';
+  this.endChar = params.endChar || '$';
+  // Make sure that the alphabet has the start and end chars.
+  this.alphabet = this.startChar + this.alphabetString + this.endChar;
+}
+
+/**
+ * Given a character, convert to the corresponding frequency.
+ */
+SonicCoder.prototype.charToFreq = function(char) {
+  // Get the index of the character.
+  var index = this.alphabet.indexOf(char);
+  if (index == -1) {
+    // If this character isn't in the alphabet, error out.
+    console.error(char, 'is an invalid character.');
+    index = this.alphabet.length - 1;
+  }
+  // Convert from index to frequency.
+  var freqRange = this.freqMax - this.freqMin;
+  var percent = index / this.alphabet.length;
+  var freqOffset = Math.round(freqRange * percent);
+  return this.freqMin + freqOffset;
+};
+
+/**
+ * Given a frequency, convert to the corresponding character.
+ */
+SonicCoder.prototype.freqToChar = function(freq) {
+  // If the frequency is out of the range.
+  if (!(this.freqMin < freq && freq < this.freqMax)) {
+    // If it's close enough to the min, clamp it (and same for max).
+    if (this.freqMin - freq < this.freqError) {
+      freq = this.freqMin;
+    } else if (freq - this.freqMax < this.freqError) {
+      freq = this.freqMax;
+    } else {
+      // Otherwise, report error.
+      console.error(freq, 'is out of range.');
+      return null;
+    }
+  }
+  // Convert frequency to index to char.
+  var freqRange = this.freqMax - this.freqMin;
+  var percent = (freq - this.freqMin) / freqRange;
+  var index = Math.round(this.alphabet.length * percent);
+  return this.alphabet[index];
+};
+
+module.exports = SonicCoder;
+
+},{}],4:[function(require,module,exports){
 var RingBuffer = require("./ring-buffer.js");
 var SonicCoder = require("./sonic-coder.js");
 
@@ -41,24 +167,20 @@ var State = {
 /**
  * Start processing the audio stream.
  */
-SonicServer.prototype.start = function () {
+SonicServer.prototype.start = function() {
   // Start listening for microphone. Continue init in onStream.
   var constraints = {
-    audio: { echoCancellation: false },
+    audio: { echoCancellation: false }
   };
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia(constraints)
+    navigator.mediaDevices.getUserMedia(constraints)
       .then(this.onStream_.bind(this))
       .catch(this.onStreamError_.bind(this));
   } else if (navigator.webkitGetUserMedia) {
-    navigator.webkitGetUserMedia(
-      constraints,
-      this.onStream_.bind(this),
-      this.onStreamError_.bind(this)
-    );
+    navigator.webkitGetUserMedia(constraints,
+        this.onStream_.bind(this), this.onStreamError_.bind(this));
   } else {
-    console.error("getUserMedia not supported");
+    console.error('getUserMedia not supported');
   }
 };
 
@@ -313,3 +435,68 @@ SonicServer.prototype.restart = function () {
 };
 
 module.exports = SonicServer;
+
+},{"./ring-buffer.js":2,"./sonic-coder.js":3}],5:[function(require,module,exports){
+var SonicCoder = require('./sonic-coder.js');
+
+var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+/**
+ * Encodes text as audio streams.
+ *
+ * 1. Receives a string of text.
+ * 2. Creates an oscillator.
+ * 3. Converts characters into frequencies.
+ * 4. Transmits frequencies, waiting in between appropriately.
+ */
+function SonicSocket(params) {
+  params = params || {};
+  this.coder = params.coder || new SonicCoder();
+  this.charDuration = params.charDuration || 0.2;
+  this.coder = params.coder || new SonicCoder(params);
+  this.rampDuration = params.rampDuration || 0.001;
+}
+
+
+SonicSocket.prototype.send = function(input, opt_callback) {
+  // Surround the word with start and end characters.
+  input = this.coder.startChar + input + this.coder.endChar;
+  // Use WAAPI to schedule the frequencies.
+  for (var i = 0; i < input.length; i++) {
+    var char = input[i];
+    var freq = this.coder.charToFreq(char);
+    var time = audioContext.currentTime + this.charDuration * i;
+    this.scheduleToneAt(freq, time, this.charDuration);
+  }
+
+  // If specified, callback after roughly the amount of time it would have
+  // taken to transmit the token.
+  if (opt_callback) {
+    var totalTime = this.charDuration * input.length;
+    setTimeout(opt_callback, totalTime * 1000);
+  }
+};
+
+SonicSocket.prototype.scheduleToneAt = function(freq, startTime, duration) {
+  var gainNode = audioContext.createGain();
+  // Gain => Merger
+  gainNode.gain.value = 0;
+
+  gainNode.gain.setValueAtTime(0, startTime);
+  gainNode.gain.linearRampToValueAtTime(1, startTime + this.rampDuration);
+  gainNode.gain.setValueAtTime(1, startTime + duration - this.rampDuration);
+  gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
+
+  gainNode.connect(audioContext.destination);
+
+  var osc = audioContext.createOscillator();
+  osc.frequency.value = freq;
+  osc.connect(gainNode);
+
+  osc.start(startTime);
+};
+
+module.exports = SonicSocket;
+
+},{"./sonic-coder.js":3}]},{},[1])(1)
+});
