@@ -45,45 +45,41 @@ function GainDemo() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-xl card overflow-hidden">
+        <div className="p-8">
+          <h1 className="text-3xl font-extrabold text-center mb-6">
             Gain Demo
           </h1>
-          <div className="text-center mb-6">
-            <button
-              onClick={play}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
-            >
-              Play Piano
-            </button>
-          </div>
-          <div className="mb-6">
-            <label
-              htmlFor="gain"
-              className="block text-gray-700 font-semibold mb-2"
-            >
-              Gain
-            </label>
-            <input
-              id="gain"
-              type="range"
-              min="0"
-              max="10"
-              step="0.01"
-              defaultValue="0.5"
-              className="w-full"
-              onChange={handleGainChange}
-            />
-          </div>
-          <div className="text-center">
-            <Link
-              to="/"
-              className="inline-block bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-            >
-              Back to Home
-            </Link>
+
+          <div className="flex flex-col items-center gap-4 mb-6 w-full">
+            <div className="w-full">
+              <label
+                htmlFor="gain"
+                className="block text-sm font-semibold muted mb-2"
+              >
+                Gain
+              </label>
+              <input
+                id="gain"
+                type="range"
+                min="0"
+                max="10"
+                step="0.01"
+                defaultValue="0.5"
+                className="w-full"
+                onChange={handleGainChange}
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button onClick={play} className="btn btn-primary">
+                Play
+              </button>
+              <Link to="/" className="btn btn-ghost">
+                Back
+              </Link>
+            </div>
           </div>
         </div>
       </div>

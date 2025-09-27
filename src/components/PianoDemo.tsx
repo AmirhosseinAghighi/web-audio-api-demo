@@ -27,25 +27,18 @@ function PianoDemo() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-xl card overflow-hidden">
+        <div className="p-8">
+          <h1 className="text-3xl font-extrabold text-center mb-6">
             Piano Demo
           </h1>
-          <div className="text-center mb-6">
-            <button
-              onClick={play}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
-            >
+
+          <div className="flex flex-col items-center gap-4 mb-6">
+            <button onClick={play} className="btn btn-primary">
               Play Piano
             </button>
-          </div>
-          <div className="text-center">
-            <Link
-              to="/"
-              className="inline-block bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-            >
+            <Link to="/" className="btn btn-ghost">
               Back to Home
             </Link>
           </div>

@@ -40,12 +40,27 @@ function AudioBufferDemo() {
   }, []);
 
   return (
-    <>
-      <h1>Audio Buffer Demo Demo</h1>
-      <button onClick={play}>play</button>
-      <br />
-      <Link to="/">Back to Home</Link>
-    </>
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-lg card overflow-hidden">
+        <div className="p-8">
+          <h1 className="text-2xl font-extrabold mb-4 text-center">
+            Audio Buffer Demo
+          </h1>
+          <p className="muted text-center mb-6">
+            Plays a short chime loaded into an AudioBuffer.
+          </p>
+
+          <div className="flex justify-center gap-4">
+            <button onClick={play} className="btn btn-primary">
+              Play
+            </button>
+            <Link to="/" className="btn btn-ghost">
+              Back
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

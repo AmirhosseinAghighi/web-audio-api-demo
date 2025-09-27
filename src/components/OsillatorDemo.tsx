@@ -21,80 +21,68 @@ const OscillatorDemo = () => {
     analyserRef.current.connect(audioCtxRef.current.destination);
     oscillatorRef.current.frequency.setValueAtTime(
       freq,
-      audioCtxRef.current.currentTime
-    );
-    oscillatorRef.current.type = type as OscillatorType;
-    gainNodeRef.current.gain.setValueAtTime(
-      gain,
-      audioCtxRef.current.currentTime
-    );
-    analyserRef.current.fftSize = 2048;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="w-full max-w-2xl card overflow-hidden">
+            <div className="p-8">
+              <h2 className="text-2xl font-extrabold mb-6 text-center">Oscillator Demo</h2>
 
-  useEffect(() => {
-    if (!analyserRef.current || !canvasRef.current || !isStarted) return;
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium muted">Gain: {gain}</label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={gain}
+                      onChange={handleGainChange}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium muted">Frequency: {freq} Hz</label>
+                    <input
+                      type="range"
+                      min="20"
+                      max="2000"
+                      step="1"
+                      value={freq}
+                      onChange={handleFreqChange}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium muted">Waveform</label>
+                    <select
+                      value={type}
+                      onChange={handleTypeChange}
+                      className="w-full p-2 border rounded-md"
+                    >
+                      <option value="sine">Sine</option>
+                      <option value="square">Square</option>
+                      <option value="sawtooth">Sawtooth</option>
+                      <option value="triangle">Triangle</option>
+                    </select>
+                  </div>
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+                  <div className="flex gap-3">
+                    <button onClick={start} disabled={isStarted} className="btn btn-primary disabled:opacity-60">Start</button>
+                    <button onClick={stop} disabled={!isStarted} className="btn btn-ghost disabled:opacity-60">Stop</button>
+                  </div>
+                </div>
 
-    const bufferLength = analyserRef.current.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    const draw = () => {
-      analyserRef.current!.getByteTimeDomainData(dataArray);
-
-      ctx.fillStyle = "rgb(240, 240, 240)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "rgb(0, 123, 255)";
-      ctx.beginPath();
-
-      const sliceWidth = canvas.width / bufferLength;
-      let x = 0;
-
-      for (let i = 0; i < bufferLength; i++) {
-        const v = dataArray[i] / 128.0;
-        const y = (v * canvas.height) / 2;
-
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-
-        x += sliceWidth;
-      }
-
-      ctx.stroke();
-
-      if (isStarted) {
-        requestAnimationFrame(draw);
-      }
-    };
-
-    draw();
-  }, [isStarted]);
-
-  const start = async () => {
-    if (audioCtxRef.current?.state === "suspended") {
-      await audioCtxRef.current.resume();
-    }
-    if (!isStarted) {
-      oscillatorRef.current?.start();
-      setIsStarted(true);
-    }
-  };
-
-  const stop = () => {
-    if (isStarted) {
-      oscillatorRef.current?.stop();
-      setIsStarted(false);
-    }
-  };
-
-  const handleGainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                <div>
+                  <div className="card-plain">
+                    <canvas ref={canvasRef} width={800} height={300}></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
     const value = parseFloat(e.target.value);
     setGain(value);
     if (gainNodeRef.current) {

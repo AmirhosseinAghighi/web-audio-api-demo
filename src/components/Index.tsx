@@ -2,59 +2,45 @@ import { Link } from "@tanstack/react-router";
 
 function Index() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-2xl card overflow-hidden">
+        <div className="p-8 md:p-12">
+          <h1 className="text-4xl hero-title text-center mb-6">
             Web Audio Demos
           </h1>
+
           <nav>
-            <ul className="space-y-4">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <li>
                 <Link
                   to="/piano"
-                  className="block w-full text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+                  className="btn btn-primary w-full text-center"
                 >
                   Piano Demo
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/audioBuffer"
-                  className="block w-full text-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
+                <Link to="/audioBuffer" className="btn btn-ghost w-full">
                   Audio Buffer Demo
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/gain"
-                  className="block w-full text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
+                <Link to="/gain" className="btn btn-ghost w-full">
                   Gain Node Demo
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/oscillator"
-                  className="block w-full text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
+                <Link to="/oscillator" className="btn btn-ghost w-full">
                   Oscillator Node Demo
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/sonicMessenger"
-                  className="block w-full text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
-                  UltraSonic network Demo
+                <Link to="/sonicMessenger" className="btn btn-ghost w-full">
+                  UltraSonic Network
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/engine"
-                  className="block w-full text-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
+                <Link to="/engine" className="btn btn-ghost w-full">
                   Engine Sound Generator
                 </Link>
               </li>
