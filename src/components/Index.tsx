@@ -44,6 +44,14 @@ function Index() {
               </li>
               <li>
                 <Link
+                  to="/sonicMessenger"
+                  className="block w-full text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+                >
+                  UltraSonic network Demo
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/engine"
                   className="block w-full text-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300"
                 >

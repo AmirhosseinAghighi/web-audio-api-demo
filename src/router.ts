@@ -8,6 +8,7 @@ import PianoDemo from "./components/PianoDemo";
 import AudioBufferDemo from "./components/AudioBufferDemo";
 import GainDemo from "./components/GainDemo";
 import OscillatorDemo from "./components/OsillatorDemo";
+import SonicMessenger from "./components/SonicMessenger";
 
 const rootRoute = createRootRoute();
 
@@ -41,12 +42,19 @@ const oscillatorRoute = createRoute({
   component: OscillatorDemo,
 });
 
+const sonicMessengerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/sonicMessenger",
+  component: SonicMessenger,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   pianoRoute,
   audioBufferRoute,
   gainRoute,
   oscillatorRoute,
+  sonicMessengerRoute,
 ]);
 
 export const router = createRouter({ routeTree });
